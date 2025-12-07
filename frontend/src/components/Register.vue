@@ -91,28 +91,27 @@ const handleRegister = async () => {
             password: formData.value.password
         })
 
-        const userData = {
-            email: response.data.user.email,
-            firstName: formData.value.firstName
+        console.log('Register response:', response.data)
+
+        // Vérifier que la réponse contient bien un token et un user
+        if (response.data && response.data.token && response.data.user) {
+            const userData = {
+                email: response.data.user.email,
+                firstName: formData.value.firstName,
+                id: response.data.user.id
+            }
+            localStorage.setItem('user', JSON.stringify(userData))
+            localStorage.setItem('token', response.data.token)
+            window.dispatchEvent(new Event('user-login'))
+            router.push({ name: 'home' })
+        } else {
+            throw new Error('Invalid response from server')
         }
-        localStorage.setItem('user', JSON.stringify(userData))
-        localStorage.setItem('token', response.data.token)
-        window.dispatchEvent(new Event('user-login'))
-        router.push({ name: 'home' })
     } catch (error) {
         console.error('Registration error:', error)
         const errorMsg = error.response?.data?.message || 'Registration failed'
         alert(errorMsg)
-
-        // Fallback
-        const userData = {
-            email: formData.value.email,
-            firstName: formData.value.firstName
-        }
-        localStorage.setItem('user', JSON.stringify(userData))
-        localStorage.setItem('token', 'mock-token-' + Date.now())
-        window.dispatchEvent(new Event('user-login'))
-        router.push({ name: 'home' })
+        // Ne pas faire de fallback - afficher l'erreur seulement
     }
 }
 </script>

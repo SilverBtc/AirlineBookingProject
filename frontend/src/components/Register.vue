@@ -21,8 +21,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" v-model="formData.username" placeholder="Choose a username"
+                        <label for="email">Email</label>
+                        <input type="email" id="email" v-model="formData.email" placeholder="Enter your email"
                             required />
                     </div>
 
@@ -61,14 +61,24 @@ const router = useRouter()
 const formData = ref({
     firstName: '',
     lastName: '',
-    username: '',
+    email: '',
     password: '',
     confirmPassword: ''
 })
 
 const acceptTerms = ref(false)
 
+const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    return emailRegex.test(email)
+}
+
 const handleRegister = async () => {
+    if (!validateEmail(formData.value.email)) {
+        alert('Please enter a valid email address')
+        return
+    }
+
     if (formData.value.password !== formData.value.confirmPassword) {
         alert('Passwords do not match')
         return
@@ -77,7 +87,7 @@ const handleRegister = async () => {
     try {
         const response = await authAPI.register({
             full_name: `${formData.value.firstName} ${formData.value.lastName}`,
-            email: formData.value.username,
+            email: formData.value.email,
             password: formData.value.password
         })
 
@@ -96,7 +106,7 @@ const handleRegister = async () => {
 
         // Fallback
         const userData = {
-            email: formData.value.username,
+            email: formData.value.email,
             firstName: formData.value.firstName
         }
         localStorage.setItem('user', JSON.stringify(userData))

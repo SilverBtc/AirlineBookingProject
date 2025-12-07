@@ -299,6 +299,10 @@
     padding: 12px 16px;
     background: white;
     position: relative;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .input-group.from-to .input-wrapper {
@@ -314,6 +318,7 @@
     font-size: 12px;
     color: #5f6368;
     margin-bottom: 4px;
+    line-height: 1;
 }
 
 .input-wrapper input {
@@ -323,6 +328,7 @@
     font-size: 16px;
     color: #202124;
     background: transparent;
+    line-height: 1.5;
 }
 
 .input-wrapper input:focus {
@@ -345,7 +351,10 @@
     background: #f8f9fa;
 }
 
-.input-group.dates,
+.input-group.dates {
+    /* Border is now on the DatePicker component itself */
+}
+
 .input-group.travelers {
     border: 1px solid #dadce0;
     border-radius: 8px;
@@ -357,6 +366,7 @@
     color: #202124;
     padding: 4px 0;
     user-select: none;
+    line-height: 1.5;
 }
 
 .input-group.travelers {

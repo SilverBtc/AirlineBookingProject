@@ -311,8 +311,8 @@ watch(() => props.modelValue.departDate, (newVal) => {
 
 .date-inputs {
     display: flex;
-    gap: 1px;
-    background: #e0e0e0;
+    gap: 0;
+    border: 1px solid #dadce0;
     border-radius: 8px;
     overflow: hidden;
 }
@@ -324,6 +324,15 @@ watch(() => props.modelValue.departDate, (newVal) => {
     cursor: pointer;
     transition: all 0.2s ease;
     min-width: 160px;
+    min-height: 60px;
+    border-right: 1px solid #dadce0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.date-input:last-child {
+    border-right: none;
 }
 
 .date-input:hover {
@@ -331,22 +340,23 @@ watch(() => props.modelValue.departDate, (newVal) => {
 }
 
 .date-input.active {
-    background: #e3f2fd;
-    box-shadow: inset 0 0 0 2px #5B9BD5;
+    background: #e8f0fe;
+    border-color: #1967d2;
 }
 
 .date-input label {
     display: block;
     font-size: 12px;
-    color: #666;
+    color: #5f6368;
     margin-bottom: 4px;
-    font-weight: 500;
+    line-height: 1;
 }
 
 .date-value {
-    font-size: 14px;
+    font-size: 16px;
     color: #202124;
-    font-weight: 500;
+    padding: 4px 0;
+    line-height: 1.5;
 }
 
 .calendar-popup {

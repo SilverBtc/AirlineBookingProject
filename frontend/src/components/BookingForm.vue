@@ -141,14 +141,18 @@
                         </section>
 
                         <div class="form-actions">
-                            <button type="button" @click="goBack" class="back-button">
+                            <button type="button" @click="goBack" class="back-button" :disabled="isSubmitting">
                                 Back to Results
                             </button>
-                            <button type="button" @click="fillTestData" class="test-button">
+                            <button type="button" @click="fillTestData" class="test-button" :disabled="isSubmitting">
                                 🎲 Fill Test Data
                             </button>
-                            <button type="submit" class="submit-button">
-                                Complete Booking - ${{ totalPrice.toFixed(2) }}
+                            <button type="submit" class="submit-button" :disabled="isSubmitting">
+                                <span v-if="!isSubmitting">Complete Booking - ${{ totalPrice.toFixed(2) }}</span>
+                                <span v-else class="submitting-content">
+                                    <span class="spinner-small"></span>
+                                    Processing...
+                                </span>
                             </button>
                         </div>
                     </form>
@@ -316,6 +320,7 @@ const formatExpiry = (e) => {
 const acceptedTerms = ref(false)
 const newsletter = ref(false)
 const showTerms = ref(false)
+const isSubmitting = ref(false)
 
 const maxDate = computed(() => {
     const date = new Date()
@@ -346,6 +351,9 @@ onMounted(() => {
 })
 
 const submitBooking = async () => {
+    // Empêcher les soumissions multiples
+    if (isSubmitting.value) return
+
     // Validate all required fields
     const allFieldsFilled = passengers.value.every(p =>
         p.title && p.firstName && p.lastName && p.dateOfBirth &&
@@ -356,6 +364,8 @@ const submitBooking = async () => {
         alert('Please fill in all required fields')
         return
     }
+
+    isSubmitting.value = true
 
     try {
         const bookingData = {
@@ -392,6 +402,8 @@ const submitBooking = async () => {
         console.error('Booking error:', error)
         const errorMsg = error.response?.data?.message || 'Booking failed'
         alert(errorMsg)
+    } finally {
+        isSubmitting.value = false
     }
 }
 

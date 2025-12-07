@@ -49,26 +49,20 @@ const handleLogin = async () => {
             password: formData.value.password
         })
 
-        localStorage.setItem('token', response.data.token)
-        localStorage.setItem('user', JSON.stringify(response.data.user))
-        window.dispatchEvent(new Event('user-login'))
-        router.push({ name: 'home' })
+        // Vérifier que la réponse contient bien un token
+        if (response.data && response.data.token) {
+            localStorage.setItem('token', response.data.token)
+            localStorage.setItem('user', JSON.stringify(response.data.user))
+            window.dispatchEvent(new Event('user-login'))
+            router.push({ name: 'home' })
+        } else {
+            throw new Error('Invalid response from server')
+        }
     } catch (error) {
         console.error('Login error:', error)
         const errorMsg = error.response?.data?.message || 'Login failed'
         alert(errorMsg)
-
-        // Fallback
-        if (formData.value.username && formData.value.password) {
-            const userData = {
-                email: formData.value.username,
-                firstName: formData.value.username
-            }
-            localStorage.setItem('user', JSON.stringify(userData))
-            localStorage.setItem('token', 'mock-token-' + Date.now())
-            window.dispatchEvent(new Event('user-login'))
-            router.push({ name: 'home' })
-        }
+        // Ne pas faire de fallback - afficher l'erreur seulement
     }
 }
 </script>

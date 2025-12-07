@@ -2,10 +2,11 @@
   "name": "frontend",
   "version": "0.0.0",
   "private": true,
+  "description": "This template should help get you started developing with Vue 3 in Vite.",
+  "license": "ISC",
+  "author": "",
   "type": "module",
-  "engines": {
-    "node": "^20.19.0 || >=22.12.0"
-  },
+  "main": "vite.config.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -19,5 +20,8 @@
     "@vitejs/plugin-vue": "^6.0.2",
     "vite": "^7.2.4",
     "vite-plugin-vue-devtools": "^8.0.5"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
   }
 }

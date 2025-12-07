@@ -13,22 +13,6 @@
     </div>
 
     <div class="help-container">
-      <div class="help-categories">
-        <h2>Browse by topic</h2>
-        <div class="category-grid">
-          <div 
-            v-for="category in categories" 
-            :key="category.id"
-            class="category-card"
-            @click="selectCategory(category)"
-          >
-            <div class="category-icon">{{ category.icon }}</div>
-            <h3>{{ category.title }}</h3>
-            <p>{{ category.description }}</p>
-          </div>
-        </div>
-      </div>
-
       <div class="faq-section">
         <h2>Frequently asked questions</h2>
         <div class="faq-list">
@@ -57,12 +41,6 @@
             <h3>Call us</h3>
             <p>+1 (800) 123-4567</p>
             <span class="availability">Available 24/7</span>
-          </div>
-          <div class="contact-card">
-            <div class="contact-icon">💬</div>
-            <h3>Live chat</h3>
-            <p>Chat with our support team</p>
-            <button class="chat-btn">Start chat</button>
           </div>
           <div class="contact-card">
             <div class="contact-icon">✉️</div>

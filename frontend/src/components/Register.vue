@@ -31,12 +31,12 @@
           </div>
 
           <div class="form-group">
-            <label for="email">Email</label>
+            <label for="username">Username</label>
             <input
-              type="email"
-              id="email"
-              v-model="formData.email"
-              placeholder="Enter your email"
+              type="text"
+              id="username"
+              v-model="formData.username"
+              placeholder="Choose a username"
               required
             />
           </div>
@@ -86,7 +86,7 @@ const router = useRouter()
 const formData = ref({
   firstName: '',
   lastName: '',
-  email: '',
+  username: '',
   password: '',
   confirmPassword: ''
 })
@@ -121,7 +121,7 @@ const handleRegister = async () => {
   // }
 
   const userData = {
-    email: formData.value.email,
+    email: formData.value.username,
     firstName: formData.value.firstName
   }
   localStorage.setItem('user', JSON.stringify(userData))

@@ -139,31 +139,7 @@
             <section class="form-section">
               <h3>Payment Information</h3>
               
-              <div class="payment-methods">
-                <label class="payment-method" :class="{ active: paymentInfo.method === 'card' }">
-                  <input type="radio" v-model="paymentInfo.method" value="card" />
-                  <div class="method-content">
-                    <span class="method-icon">💳</span>
-                    <span>Credit/Debit Card</span>
-                  </div>
-                </label>
-                <label class="payment-method" :class="{ active: paymentInfo.method === 'paypal' }">
-                  <input type="radio" v-model="paymentInfo.method" value="paypal" />
-                  <div class="method-content">
-                    <span class="method-icon">🅿️</span>
-                    <span>PayPal</span>
-                  </div>
-                </label>
-                <label class="payment-method" :class="{ active: paymentInfo.method === 'bank' }">
-                  <input type="radio" v-model="paymentInfo.method" value="bank" />
-                  <div class="method-content">
-                    <span class="method-icon">🏦</span>
-                    <span>Bank Transfer</span>
-                  </div>
-                </label>
-              </div>
-
-              <div v-if="paymentInfo.method === 'card'" class="card-payment-form">
+              <div class="card-payment-form">
                 <div class="form-group">
                   <label for="cardNumber">Card Number *</label>
                   <input
@@ -175,11 +151,6 @@
                     maxlength="19"
                     required
                   />
-                  <div class="card-types">
-                    <span class="card-type">VISA</span>
-                    <span class="card-type">Mastercard</span>
-                    <span class="card-type">AMEX</span>
-                  </div>
                 </div>
 
                 <div class="form-row">
@@ -231,44 +202,13 @@
                   />
                 </div>
               </div>
-
-              <div v-if="paymentInfo.method === 'paypal'" class="paypal-payment">
-                <p class="payment-note">You will be redirected to PayPal to complete your payment securely.</p>
-                <button type="button" class="paypal-btn">Continue with PayPal</button>
-              </div>
-
-              <div v-if="paymentInfo.method === 'bank'" class="bank-payment">
-                <p class="payment-note">Bank transfer instructions will be sent to your email after booking confirmation.</p>
-                <div class="bank-info">
-                  <p><strong>Note:</strong> Your booking will be held for 24 hours pending payment confirmation.</p>
-                </div>
-              </div>
-
-              <div class="secure-payment-badge">
-                <span class="badge-icon">🔒</span>
-                <span>Your payment information is encrypted and secure</span>
-              </div>
-            </section>
-
-            <!-- Terms and Conditions -->
-            <section class="form-section">
-              <div class="checkbox-group">
-                <label class="terms-checkbox">
-                  <input type="checkbox" v-model="acceptedTerms" required />
-                  I accept the <a href="#" @click.prevent="showTerms = true">Terms and Conditions</a>
-                </label>
-                <label>
-                  <input type="checkbox" v-model="newsletter" />
-                  Subscribe to newsletter for exclusive deals
-                </label>
-              </div>
             </section>
 
             <div class="form-actions">
               <button type="button" @click="goBack" class="back-button">
                 Back to Results
               </button>
-              <button type="submit" class="submit-button" :disabled="!acceptedTerms">
+              <button type="submit" class="submit-button">
                 Complete Booking - ${{ totalPrice }}
               </button>
             </div>
@@ -445,42 +385,9 @@ const submitBooking = async () => {
     return
   }
 
-  if (!acceptedTerms.value) {
-    alert('Please accept the terms and conditions')
-    return
-  }
-
-  // TODO: Send booking to backend API
-  // Example:
-  // try {
-  //   const bookingData = {
-  //     flightId: route.query.flightId,
-  //     passengers: passengers.value,
-  //     contactInfo: contactInfo.value,
-  //     paymentInfo: paymentInfo.value,
-  //     totalPrice: totalPrice.value
-  //   }
-  //   const response = await axios.post('http://localhost:3000/api/bookings', bookingData)
-  //   const bookingReference = response.data.bookingReference
-  //   router.push({
-  //     name: 'confirmation',
-  //     query: {
-  //       bookingRef: bookingReference,
-  //       origin: origin.value,
-  //       destination: destination.value,
-  //       departDate: departDate.value,
-  //       passengers: passengerCount.value,
-  //       total: totalPrice.value,
-  //       email: contactInfo.value.email
-  //     }
-  //   })
-  // } catch (error) {
-  //   alert('Error creating booking: ' + error.message)
-  // }
-
-  // Generate booking reference (temporary - replace with backend response)
+  // Generate booking reference (fake data accepted)
   const bookingReference = 'BK' + Math.random().toString(36).substr(2, 9).toUpperCase()
-
+  
   // Navigate to confirmation page
   router.push({
     name: 'confirmation',

@@ -19,15 +19,6 @@
         <button :class="['chip', { active: sortBy === 'duration' }]" @click="sortBy = 'duration'">
           Quickest
         </button>
-        <button class="chip">
-          Stops
-        </button>
-        <button class="chip">
-          Times
-        </button>
-        <button class="chip">
-          Airlines
-        </button>
       </div>
     </div>
 

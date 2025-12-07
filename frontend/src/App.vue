@@ -138,14 +138,6 @@ onMounted(() => {
       <div class="footer-bottom">
         <div class="footer-bottom-content">
           <p>&copy; 2025 SkyBooker. All rights reserved.</p>
-          <div class="payment-methods">
-            <span>We accept:</span>
-            <div class="payment-icons">
-              <span class="payment-icon">💳</span>
-              <span class="payment-icon">💰</span>
-              <span class="payment-icon">🏦</span>
-            </div>
-          </div>
         </div>
       </div>
     </footer>

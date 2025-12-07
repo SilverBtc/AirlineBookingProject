@@ -1,132 +1,108 @@
 <template>
-  <div class="auth-page">
-    <div class="auth-container">
-      <div class="auth-card">
-        <h1>Create account</h1>
-        <p class="subtitle">Sign up to start booking flights</p>
+    <div class="auth-page">
+        <div class="auth-container">
+            <div class="auth-card">
+                <h1>Create account</h1>
+                <p class="subtitle">Sign up to start booking flights</p>
 
-        <form @submit.prevent="handleRegister" class="auth-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="firstName">First name</label>
-              <input
-                type="text"
-                id="firstName"
-                v-model="formData.firstName"
-                placeholder="First name"
-                required
-              />
+                <form @submit.prevent="handleRegister" class="auth-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First name</label>
+                            <input type="text" id="firstName" v-model="formData.firstName" placeholder="First name"
+                                required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lastName">Last name</label>
+                            <input type="text" id="lastName" v-model="formData.lastName" placeholder="Last name"
+                                required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" v-model="formData.username" placeholder="Choose a username"
+                            required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" v-model="formData.password" placeholder="Create a password"
+                            required minlength="8" />
+                        <span class="hint">At least 8 characters</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm password</label>
+                        <input type="password" id="confirmPassword" v-model="formData.confirmPassword"
+                            placeholder="Confirm your password" required />
+                    </div>
+
+                    <button type="submit" class="submit-btn">Create account</button>
+                </form>
+
+                <div class="auth-footer">
+                    Already have an account?
+                    <router-link to="/login">Sign in</router-link>
+                </div>
             </div>
-
-            <div class="form-group">
-              <label for="lastName">Last name</label>
-              <input
-                type="text"
-                id="lastName"
-                v-model="formData.lastName"
-                placeholder="Last name"
-                required
-              />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              v-model="formData.username"
-              placeholder="Choose a username"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              v-model="formData.password"
-              placeholder="Create a password"
-              required
-              minlength="8"
-            />
-            <span class="hint">At least 8 characters</span>
-          </div>
-
-          <div class="form-group">
-            <label for="confirmPassword">Confirm password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              v-model="formData.confirmPassword"
-              placeholder="Confirm your password"
-              required
-            />
-          </div>
-
-          <button type="submit" class="submit-btn">Create account</button>
-        </form>
-
-        <div class="auth-footer">
-          Already have an account? 
-          <router-link to="/login">Sign in</router-link>
         </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { authAPI } from '../services/api'
 
 const router = useRouter()
 
 const formData = ref({
-  firstName: '',
-  lastName: '',
-  username: '',
-  password: '',
-  confirmPassword: ''
+    firstName: '',
+    lastName: '',
+    username: '',
+    password: '',
+    confirmPassword: ''
 })
 
 const acceptTerms = ref(false)
 
 const handleRegister = async () => {
-  if (formData.value.password !== formData.value.confirmPassword) {
-    alert('Passwords do not match')
-    return
-  }
+    if (formData.value.password !== formData.value.confirmPassword) {
+        alert('Passwords do not match')
+        return
+    }
 
-  // TODO: Replace with actual API call
-  // Example:
-  // try {
-  //   const response = await axios.post('http://localhost:3000/api/auth/register', {
-  //     firstName: formData.value.firstName,
-  //     lastName: formData.value.lastName,
-  //     email: formData.value.email,
-  //     password: formData.value.password
-  //   })
-  //   const userData = {
-  //     email: response.data.email,
-  //     firstName: response.data.firstName
-  //   }
-  //   localStorage.setItem('user', JSON.stringify(userData))
-  //   localStorage.setItem('token', response.data.token)
-  //   window.dispatchEvent(new Event('user-login'))
-  //   router.push({ name: 'home' })
-  // } catch (error) {
-  //   alert('Registration failed: ' + error.message)
-  // }
+    try {
+        const response = await authAPI.register({
+            full_name: `${formData.value.firstName} ${formData.value.lastName}`,
+            email: formData.value.username,
+            password: formData.value.password
+        })
 
-  const userData = {
-    email: formData.value.username,
-    firstName: formData.value.firstName
-  }
-  localStorage.setItem('user', JSON.stringify(userData))
-  localStorage.setItem('token', 'mock-token-' + Date.now())
-  window.dispatchEvent(new Event('user-login'))
-  router.push({ name: 'home' })
+        const userData = {
+            email: response.data.user.email,
+            firstName: formData.value.firstName
+        }
+        localStorage.setItem('user', JSON.stringify(userData))
+        localStorage.setItem('token', response.data.token)
+        window.dispatchEvent(new Event('user-login'))
+        router.push({ name: 'home' })
+    } catch (error) {
+        console.error('Registration error:', error)
+        const errorMsg = error.response?.data?.message || 'Registration failed'
+        alert(errorMsg)
+
+        // Fallback pour démo
+        const userData = {
+            email: formData.value.username,
+            firstName: formData.value.firstName
+        }
+        localStorage.setItem('user', JSON.stringify(userData))
+        localStorage.setItem('token', 'mock-token-' + Date.now())
+        window.dispatchEvent(new Event('user-login'))
+        router.push({ name: 'home' })
+    }
 }
 </script>

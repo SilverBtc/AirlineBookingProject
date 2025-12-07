@@ -1,110 +1,104 @@
 <template>
   <div class="flight-results">
-    <div class="results-header">
+    <div class="results-top">
       <div class="search-summary">
-        <h2>{{ origin }} → {{ destination }}</h2>
-        <p>{{ departDate }} {{ returnDate ? `- ${returnDate}` : '' }} • {{ passengers }} {{ passengers === 1 ? 'Passenger' : 'Passengers' }}</p>
+        <button @click="modifySearch" class="back-btn">←</button>
+        <div class="route-info">
+          <h2>{{ origin }} → {{ destination }}</h2>
+          <p>{{ formatDate(departDate) }} {{ returnDate ? `- ${formatDate(returnDate)}` : '' }} • {{ passengers }} traveler{{ passengers > 1 ? 's' : '' }}</p>
+        </div>
       </div>
-      <button @click="modifySearch" class="modify-button">Modify Search</button>
+
+      <div class="filter-chips">
+        <button :class="['chip', { active: sortBy === 'best' }]" @click="sortBy = 'best'">
+          Best
+        </button>
+        <button :class="['chip', { active: sortBy === 'price' }]" @click="sortBy = 'price'">
+          Cheapest
+        </button>
+        <button :class="['chip', { active: sortBy === 'duration' }]" @click="sortBy = 'duration'">
+          Quickest
+        </button>
+        <button class="chip">
+          Stops
+        </button>
+        <button class="chip">
+          Times
+        </button>
+        <button class="chip">
+          Airlines
+        </button>
+      </div>
     </div>
 
     <div class="results-container">
 
+      <div class="flights-list">
+        <div
+          v-for="flight in sortedFlights"
+          :key="flight.id"
+          class="flight-card"
+          @click="selectFlight(flight)"
+        >
+          <div class="flight-main">
+            <div class="airline-info">
+              <div class="airline-logo-circle">{{ flight.airline.substring(0, 2).toUpperCase() }}</div>
+              <div class="airline-name">{{ flight.airline }}</div>
+            </div>
 
-      <div class="results-main">
-        <div class="sort-bar">
-          <div class="results-count">{{ filteredFlights.length }} flights found</div>
-          <div class="sort-options">
-            <label>Sort by:</label>
-            <select v-model="sortBy">
-              <option value="price">Lowest Price</option>
-              <option value="duration">Shortest Duration</option>
-              <option value="departure">Departure Time</option>
-              <option value="arrival">Arrival Time</option>
-            </select>
+            <div class="flight-times">
+              <div class="time-block">
+                <div class="time">{{ flight.departureTime }}</div>
+                <div class="airport">{{ flight.originCode }}</div>
+              </div>
+              
+              <div class="flight-middle">
+                <div class="duration">{{ flight.duration }}</div>
+                <div class="timeline">
+                  <div class="line"></div>
+                  <div class="stops-dot" v-if="flight.stops > 0"></div>
+                </div>
+                <div class="stops-info">{{ flight.stops === 0 ? 'Nonstop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}` }}</div>
+              </div>
+
+              <div class="time-block">
+                <div class="time">{{ flight.arrivalTime }}</div>
+                <div class="airport">{{ flight.destinationCode }}</div>
+              </div>
+            </div>
+
+            <div class="flight-price-section">
+              <div class="price-amount">${{ flight.price }}</div>
+              <div class="price-type">{{ travelClass }}</div>
+            </div>
           </div>
-        </div>
 
-        <div class="flights-list">
-          <div
-            v-for="flight in sortedFlights"
-            :key="flight.id"
-            class="flight-card"
-          >
-            <div class="flight-info">
-              <div class="airline-logo">
-                <div class="logo-placeholder">{{ flight.airline.substring(0, 2) }}</div>
-                <div class="airline-name">{{ flight.airline }}</div>
+          <div v-if="flight.stops === 0" class="flight-badges">
+            <span class="badge-green">Nonstop</span>
+          </div>
+
+          <div v-if="expandedFlight === flight.id" class="flight-details-expanded">
+            <div class="detail-section">
+              <h4>Flight details</h4>
+              <div class="detail-item">
+                <span class="detail-label">Aircraft</span>
+                <span>{{ flight.aircraft }}</span>
               </div>
-
-              <div class="flight-details">
-                <div class="flight-time">
-                  <div class="time-info">
-                    <div class="time">{{ flight.departureTime }}</div>
-                    <div class="airport">{{ flight.originCode }}</div>
-                  </div>
-                  
-                  <div class="flight-path">
-                    <div class="duration">{{ flight.duration }}</div>
-                    <div class="path-line">
-                      <div class="line"></div>
-                      <div class="stops">{{ flight.stops === 0 ? 'Direct' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}` }}</div>
-                    </div>
-                  </div>
-
-                  <div class="time-info">
-                    <div class="time">{{ flight.arrivalTime }}</div>
-                    <div class="airport">{{ flight.destinationCode }}</div>
-                  </div>
-                </div>
-
-                <div class="flight-meta">
-                  <span class="flight-number">{{ flight.flightNumber }}</span>
-                  <span v-if="flight.stops === 0" class="badge direct">Direct Flight</span>
-                  <span v-if="flight.refundable" class="badge refundable">Refundable</span>
-                </div>
+              <div class="detail-item">
+                <span class="detail-label">Baggage</span>
+                <span>{{ flight.baggage }}</span>
               </div>
-
-              <div class="flight-price">
-                <div class="price">${{ flight.price }}</div>
-                <div class="price-label">per person</div>
-                <button @click="selectFlight(flight)" class="select-button">
-                  Select Flight
-                </button>
+              <div class="detail-item">
+                <span class="detail-label">Flight number</span>
+                <span>{{ flight.flightNumber }}</span>
               </div>
             </div>
-
-            <div v-if="expandedFlight === flight.id" class="flight-expanded">
-              <div class="expanded-details">
-                <h4>Flight Details</h4>
-                <div class="detail-row">
-                  <span>Aircraft:</span>
-                  <span>{{ flight.aircraft }}</span>
-                </div>
-                <div class="detail-row">
-                  <span>Cabin Class:</span>
-                  <span>{{ travelClass }}</span>
-                </div>
-                <div class="detail-row">
-                  <span>Baggage:</span>
-                  <span>{{ flight.baggage }}</span>
-                </div>
-                <div class="detail-row">
-                  <span>Seat Selection:</span>
-                  <span>{{ flight.seatSelection }}</span>
-                </div>
-              </div>
-            </div>
-
-            <button @click="toggleExpanded(flight.id)" class="details-toggle">
-              {{ expandedFlight === flight.id ? '▲ Hide Details' : '▼ Show Details' }}
-            </button>
           </div>
         </div>
 
         <div v-if="filteredFlights.length === 0" class="no-results">
-          <h3>No flights found</h3>
-          <p>Try adjusting your filters or search criteria</p>
+          <p>No flights found</p>
+          <button @click="modifySearch">Change search</button>
         </div>
       </div>
     </div>
@@ -126,11 +120,38 @@ const passengers = ref(parseInt(route.query.passengers) || 1)
 const travelClass = ref(route.query.travelClass || 'economy')
 
 const expandedFlight = ref(null)
-const sortBy = ref('price')
+const sortBy = ref('best')
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+}
 
 
 
-// Mock flight data
+// TODO: Replace with API call
+// Example:
+// const fetchFlights = async () => {
+//   try {
+//     const response = await axios.post('http://localhost:3000/api/flights/search', {
+//       origin: origin.value,
+//       destination: destination.value,
+//       departDate: departDate.value,
+//       returnDate: returnDate.value,
+//       passengers: passengers.value,
+//       travelClass: travelClass.value
+//     })
+//     flights.value = response.data.flights
+//   } catch (error) {
+//     console.error('Error fetching flights:', error)
+//   }
+// }
+// onMounted(() => {
+//   fetchFlights()
+// })
+
+// Mock flight data - Replace with API data
 const flights = ref([
   {
     id: 1,

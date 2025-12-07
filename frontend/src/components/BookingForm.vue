@@ -139,64 +139,114 @@
             <section class="form-section">
               <h3>Payment Information</h3>
               
-              <div class="form-group">
-                <label for="cardNumber">Card Number *</label>
-                <input
-                  type="text"
-                  id="cardNumber"
-                  v-model="paymentInfo.cardNumber"
-                  placeholder="1234 5678 9012 3456"
-                  maxlength="19"
-                  required
-                />
+              <div class="payment-methods">
+                <label class="payment-method" :class="{ active: paymentInfo.method === 'card' }">
+                  <input type="radio" v-model="paymentInfo.method" value="card" />
+                  <div class="method-content">
+                    <span class="method-icon">💳</span>
+                    <span>Credit/Debit Card</span>
+                  </div>
+                </label>
+                <label class="payment-method" :class="{ active: paymentInfo.method === 'paypal' }">
+                  <input type="radio" v-model="paymentInfo.method" value="paypal" />
+                  <div class="method-content">
+                    <span class="method-icon">🅿️</span>
+                    <span>PayPal</span>
+                  </div>
+                </label>
+                <label class="payment-method" :class="{ active: paymentInfo.method === 'bank' }">
+                  <input type="radio" v-model="paymentInfo.method" value="bank" />
+                  <div class="method-content">
+                    <span class="method-icon">🏦</span>
+                    <span>Bank Transfer</span>
+                  </div>
+                </label>
               </div>
 
-              <div class="form-row">
+              <div v-if="paymentInfo.method === 'card'" class="card-payment-form">
                 <div class="form-group">
-                  <label for="cardName">Name on Card *</label>
+                  <label for="cardNumber">Card Number *</label>
                   <input
                     type="text"
-                    id="cardName"
-                    v-model="paymentInfo.cardName"
-                    placeholder="John Doe"
+                    id="cardNumber"
+                    v-model="paymentInfo.cardNumber"
+                    @input="formatCardNumber"
+                    placeholder="1234 5678 9012 3456"
+                    maxlength="19"
                     required
                   />
+                  <div class="card-types">
+                    <span class="card-type">VISA</span>
+                    <span class="card-type">Mastercard</span>
+                    <span class="card-type">AMEX</span>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="cardName">Name on Card *</label>
+                    <input
+                      type="text"
+                      id="cardName"
+                      v-model="paymentInfo.cardName"
+                      placeholder="John Doe"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="expiry">Expiry Date *</label>
+                    <input
+                      type="text"
+                      id="expiry"
+                      v-model="paymentInfo.expiryDate"
+                      @input="formatExpiry"
+                      placeholder="MM/YY"
+                      maxlength="5"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="cvv">CVV *</label>
+                    <input
+                      type="text"
+                      id="cvv"
+                      v-model="paymentInfo.cvv"
+                      placeholder="123"
+                      maxlength="4"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div class="form-group">
-                  <label for="expiry">Expiry Date *</label>
+                  <label for="billingAddress">Billing Address *</label>
                   <input
                     type="text"
-                    id="expiry"
-                    v-model="paymentInfo.expiryDate"
-                    placeholder="MM/YY"
-                    maxlength="5"
-                    required
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="cvv">CVV *</label>
-                  <input
-                    type="text"
-                    id="cvv"
-                    v-model="paymentInfo.cvv"
-                    placeholder="123"
-                    maxlength="4"
+                    id="billingAddress"
+                    v-model="paymentInfo.billingAddress"
+                    placeholder="123 Main St, City, Country"
                     required
                   />
                 </div>
               </div>
 
-              <div class="form-group">
-                <label for="billingAddress">Billing Address *</label>
-                <input
-                  type="text"
-                  id="billingAddress"
-                  v-model="paymentInfo.billingAddress"
-                  placeholder="123 Main St, City, Country"
-                  required
-                />
+              <div v-if="paymentInfo.method === 'paypal'" class="paypal-payment">
+                <p class="payment-note">You will be redirected to PayPal to complete your payment securely.</p>
+                <button type="button" class="paypal-btn">Continue with PayPal</button>
+              </div>
+
+              <div v-if="paymentInfo.method === 'bank'" class="bank-payment">
+                <p class="payment-note">Bank transfer instructions will be sent to your email after booking confirmation.</p>
+                <div class="bank-info">
+                  <p><strong>Note:</strong> Your booking will be held for 24 hours pending payment confirmation.</p>
+                </div>
+              </div>
+
+              <div class="secure-payment-badge">
+                <span class="badge-icon">🔒</span>
+                <span>Your payment information is encrypted and secure</span>
               </div>
             </section>
 
@@ -329,6 +379,7 @@ const specialRequests = ref({
 })
 
 const paymentInfo = ref({
+  method: 'card',
   cardNumber: '',
   cardName: '',
   expiryDate: '',
@@ -336,12 +387,26 @@ const paymentInfo = ref({
   billingAddress: ''
 })
 
+const formatCardNumber = (e) => {
+  let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '')
+  let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value
+  paymentInfo.value.cardNumber = formattedValue
+}
+
+const formatExpiry = (e) => {
+  let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '')
+  if (value.length >= 2) {
+    value = value.slice(0, 2) + '/' + value.slice(2, 4)
+  }
+  paymentInfo.value.expiryDate = value
+}
+
 const acceptedTerms = ref(false)
 const newsletter = ref(false)
 const showTerms = ref(false)
 
 const maxDate = computed(() => {
-  const date = new Date()
+  const date = new Date() 
   date.setFullYear(date.getFullYear() - 12)
   return date.toISOString().split('T')[0]
 })
@@ -368,7 +433,7 @@ onMounted(() => {
   }
 })
 
-const submitBooking = () => {
+const submitBooking = async () => {
   // Validate all required fields
   const allFieldsFilled = passengers.value.every(p => 
     p.title && p.firstName && p.lastName && p.dateOfBirth && 
@@ -385,7 +450,35 @@ const submitBooking = () => {
     return
   }
 
-  // Generate booking reference
+  // TODO: Send booking to backend API
+  // Example:
+  // try {
+  //   const bookingData = {
+  //     flightId: route.query.flightId,
+  //     passengers: passengers.value,
+  //     contactInfo: contactInfo.value,
+  //     paymentInfo: paymentInfo.value,
+  //     totalPrice: totalPrice.value
+  //   }
+  //   const response = await axios.post('http://localhost:3000/api/bookings', bookingData)
+  //   const bookingReference = response.data.bookingReference
+  //   router.push({
+  //     name: 'confirmation',
+  //     query: {
+  //       bookingRef: bookingReference,
+  //       origin: origin.value,
+  //       destination: destination.value,
+  //       departDate: departDate.value,
+  //       passengers: passengerCount.value,
+  //       total: totalPrice.value,
+  //       email: contactInfo.value.email
+  //     }
+  //   })
+  // } catch (error) {
+  //   alert('Error creating booking: ' + error.message)
+  // }
+
+  // Generate booking reference (temporary - replace with backend response)
   const bookingReference = 'BK' + Math.random().toString(36).substr(2, 9).toUpperCase()
 
   // Navigate to confirmation page

@@ -58,7 +58,7 @@ const handleLogin = async () => {
         const errorMsg = error.response?.data?.message || 'Login failed'
         alert(errorMsg)
 
-        // Fallback pour démo
+        // Fallback
         if (formData.value.username && formData.value.password) {
             const userData = {
                 email: formData.value.username,

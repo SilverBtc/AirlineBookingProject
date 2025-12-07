@@ -137,7 +137,7 @@ const searchParams = ref({
     travelClass: 'economy'
 })
 
-// Synchroniser les dates avec searchParams
+// Synchronize dateSelection with searchParams
 watch(dateSelection, (newDates) => {
     searchParams.value.departDate = newDates.departDate
     searchParams.value.returnDate = newDates.returnDate

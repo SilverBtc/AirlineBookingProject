@@ -105,17 +105,17 @@ const displayMonths = computed(() => {
         const days = []
         const startPadding = firstDay.getDay()
 
-        // Padding avant le premier jour
+        // Padding before first day
         for (let j = 0; j < startPadding; j++) {
             days.push({ date: null })
         }
 
-        // Jours du mois
+        // Days of the month
         for (let day = 1; day <= lastDay.getDate(); day++) {
             days.push({ date: new Date(year, month, day) })
         }
 
-        // Padding après le dernier jour
+        // Padding after last day
         const endPadding = 42 - days.length
         for (let j = 0; j < endPadding; j++) {
             days.push({ date: null })
@@ -187,7 +187,7 @@ const selectDate = (day) => {
 
         if (props.isRoundTrip) {
             activeField.value = 'return'
-            // Si la date de retour est avant la nouvelle date de départ, la réinitialiser
+            // If the return date is before the new departure date, reset it
             if (props.modelValue.returnDate && props.modelValue.returnDate < dateStr) {
                 emit('update:modelValue', {
                     ...props.modelValue,
@@ -225,7 +225,7 @@ const getDayClasses = (day) => {
 
     const classes = ['day']
 
-    // Jour passé
+    // Past day
     if (dayDate < today) {
         classes.push('disabled')
         return classes.join(' ')
@@ -241,22 +241,22 @@ const getDayClasses = (day) => {
         returnDate.setHours(0, 0, 0, 0)
     }
 
-    // Date de départ sélectionnée
+    // Selected departure date
     if (departDate && dayDate.getTime() === departDate.getTime()) {
         classes.push('selected', 'start')
     }
 
-    // Date de retour sélectionnée
+    // Selected return date
     if (returnDate && dayDate.getTime() === returnDate.getTime()) {
         classes.push('selected', 'end')
     }
 
-    // Plage entre départ et retour
+    // Range between departure and return
     if (departDate && returnDate && dayDate > departDate && dayDate < returnDate) {
         classes.push('in-range')
     }
 
-    // Hover pour prévisualiser la plage
+    // Hover to preview the range
     if (props.isRoundTrip && activeField.value === 'return' && departDate && hoveredDate.value) {
         const hovered = new Date(hoveredDate.value)
         hovered.setHours(0, 0, 0, 0)
@@ -266,7 +266,7 @@ const getDayClasses = (day) => {
         }
     }
 
-    // Désactiver les dates avant le départ pour le retour
+    // Desactivate return dates before departure date
     if (activeField.value === 'return' && departDate && dayDate < departDate) {
         classes.push('disabled')
     }

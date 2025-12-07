@@ -94,7 +94,7 @@ const handleRegister = async () => {
         const errorMsg = error.response?.data?.message || 'Registration failed'
         alert(errorMsg)
 
-        // Fallback pour démo
+        // Fallback
         const userData = {
             email: formData.value.username,
             firstName: formData.value.firstName

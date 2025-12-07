@@ -247,18 +247,18 @@ const fetchFlights = async () => {
 
         const response = await flightAPI.search(params)
 
-        // Gérer la réponse selon le type de vol
+        // Handle response based on trip type
         if (response.data.tripType === 'roundtrip' && response.data.return) {
             flights.value = response.data.outbound.map(formatFlightData)
             returnFlights.value = response.data.return.map(formatFlightData)
-            step.value = 1 // Commencer par la sélection du vol aller
+            step.value = 1 // Start with outbound flight selection
         } else {
-            // Aller simple
+            // oneway
             flights.value = response.data.outbound.map(formatFlightData)
             returnFlights.value = []
         }
 
-        // Si aucun vol trouvé
+        // If no flights found
         if (flights.value.length === 0) {
             console.warn('No flights found in database')
         }
@@ -275,23 +275,23 @@ onMounted(() => {
 })
 
 const filteredFlights = computed(() => {
-    // Afficher les vols aller si step 1, ou les vols retour si step 2
+    // Show outbound flights if step 1, or return flights if step 2
     return step.value === 1 ? flights.value : returnFlights.value
 })
 
 const selectOutboundFlight = (flight) => {
     if (tripType.value === 'roundtrip') {
         selectedOutboundFlight.value = flight
-        step.value = 2 // Passer à la sélection du vol retour
+        step.value = 2 // Move to return flight selection
         window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
-        // Aller simple, aller directement à la réservation
+        // One way, go directly to booking
         goToBooking(flight, null)
     }
 }
 
 const selectReturnFlight = (flight) => {
-    // Aller à la réservation avec les deux vols
+    // Go to booking with both flights
     goToBooking(selectedOutboundFlight.value, flight)
 }
 

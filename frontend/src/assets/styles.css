@@ -358,6 +358,7 @@
 .input-group.travelers {
     border: 1px solid #dadce0;
     border-radius: 8px;
+    overflow: hidden;
 }
 
 .travelers-display {
@@ -385,6 +386,7 @@
     padding: 16px;
     z-index: 1000;
     min-width: 280px;
+    overflow: hidden;
 }
 
 .traveler-row {

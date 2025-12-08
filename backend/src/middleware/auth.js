@@ -6,7 +6,7 @@ function authenticate(req, res, next) {
     const authHeader = req.headers.authorization;
 
     if (!authHeader?.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Missing or invalid Authorization header' });
+        return res.status(401).json({ message: 'You have to be registered and logged in in order to complete booking' });
     }
 
     const token = authHeader.substring(7);
@@ -16,7 +16,7 @@ function authenticate(req, res, next) {
         req.user = payload; // { id, role, email }
         next();
     } catch (err) {
-        return res.status(401).json({ message: 'Invalid token' });
+        return res.status(401).json({ message: 'You have to be registered and logged in in order to complete booking' });
     }
 }
 

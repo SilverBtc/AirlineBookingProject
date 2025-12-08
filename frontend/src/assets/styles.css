@@ -358,7 +358,11 @@
 .input-group.travelers {
     border: 1px solid #dadce0;
     border-radius: 8px;
-    overflow: hidden;
+    position: relative;
+}
+
+.input-group.travelers .input-wrapper {
+    border-radius: 8px;
 }
 
 .travelers-display {
@@ -368,10 +372,6 @@
     padding: 4px 0;
     user-select: none;
     line-height: 1.5;
-}
-
-.input-group.travelers {
-    position: relative;
 }
 
 .travelers-dropdown {

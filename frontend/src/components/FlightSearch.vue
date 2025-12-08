@@ -179,6 +179,11 @@ const searchFlights = async () => {
         return
     }
 
+    if (searchParams.value.origin === searchParams.value.destination) {
+        alert('Departure and arrival destinations cannot be the same')
+        return
+    }
+
     router.push({
         name: 'results',
         query: {

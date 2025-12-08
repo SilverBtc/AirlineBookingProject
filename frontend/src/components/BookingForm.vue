@@ -337,6 +337,14 @@ const totalPrice = computed(() => {
 })
 
 onMounted(() => {
+    // Check if user is logged in
+    const user = localStorage.getItem('user')
+    if (!user) {
+        alert('You have to be registered and logged in in order to complete booking')
+        router.push({ name: 'login', query: { redirect: route.fullPath } })
+        return
+    }
+
     // Initialize passenger forms
     for (let i = 0; i < passengerCount.value; i++) {
         passengers.value.push({

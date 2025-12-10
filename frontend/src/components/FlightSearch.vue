@@ -18,8 +18,8 @@
                 <div class="main-inputs">
                     <div class="input-group from-to">
                         <div class="input-wrapper">
-                            <label>Where from?</label>
-                            <input type="text" v-model="searchParams.origin" placeholder="City or airport" required
+                            <label for="origin-input">Where from?</label>
+                            <input type="text" id="origin-input" v-model="searchParams.origin" placeholder="City or airport" required
                                 list="origin-airports" />
                             <datalist id="origin-airports">
                                 <option v-for="airport in airports" :key="airport.code" :value="airport.code">
@@ -28,11 +28,11 @@
                             </datalist>
                         </div>
 
-                        <button type="button" class="swap-btn" @click="swapLocations">⇄</button>
+                        <button type="button" class="swap-btn" @click="swapLocations" aria-label="Swap departure and arrival locations">⇄</button>
 
                         <div class="input-wrapper">
-                            <label>Where to?</label>
-                            <input type="text" v-model="searchParams.destination" placeholder="City or airport" required
+                            <label for="destination-input">Where to?</label>
+                            <input type="text" id="destination-input" v-model="searchParams.destination" placeholder="City or airport" required
                                 list="destination-airports" />
                             <datalist id="destination-airports">
                                 <option v-for="airport in airports" :key="airport.code" :value="airport.code">
@@ -47,10 +47,11 @@
                             depart-label="Departure" return-label="Return" />
                     </div>
 
-                    <div class="input-group travelers" style="position: relative;">
+                    <div class="input-group travelers">
                         <div class="input-wrapper" @click.stop="showTravelersDropdown = !showTravelersDropdown">
-                            <label>Travelers</label>
-                            <div class="travelers-display">
+                            <label for="travelers-display">Travelers</label>
+                            <div id="travelers-display" class="travelers-display" role="button" tabindex="0" 
+                                aria-haspopup="true" :aria-expanded="showTravelersDropdown">
                                 {{ searchParams.passengers }} passenger{{ searchParams.passengers > 1 ? 's' : '' }}, {{
                                 searchParams.travelClass }}
                             </div>
@@ -60,9 +61,9 @@
                             <div class="traveler-row">
                                 <span>Passengers</span>
                                 <div class="counter">
-                                    <button type="button" @click.prevent="decrementPassengers">−</button>
+                                    <button type="button" @click.prevent="decrementPassengers" aria-label="Decrease passengers">−</button>
                                     <span>{{ searchParams.passengers }}</span>
-                                    <button type="button" @click.prevent="incrementPassengers">+</button>
+                                    <button type="button" @click.prevent="incrementPassengers" aria-label="Increase passengers">+</button>
                                 </div>
                             </div>
                             <div class="class-options">

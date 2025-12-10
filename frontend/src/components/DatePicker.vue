@@ -2,7 +2,8 @@
     <div class="date-picker" ref="datePickerRef">
         <div class="date-inputs">
             <div class="date-input" @click="openCalendar('depart')"
-                :class="{ active: isOpen && activeField === 'depart' }">
+                :class="{ active: isOpen && activeField === 'depart' }"
+                role="button" tabindex="0" :aria-label="`Select ${departLabel} date`">
                 <label>{{ departLabel }}</label>
                 <div class="date-value">
                     {{ formatDisplayDate(modelValue.departDate) }}
@@ -10,7 +11,8 @@
             </div>
 
             <div v-if="isRoundTrip" class="date-input" @click="openCalendar('return')"
-                :class="{ active: isOpen && activeField === 'return' }">
+                :class="{ active: isOpen && activeField === 'return' }"
+                role="button" tabindex="0" :aria-label="`Select ${returnLabel} date`">
                 <label>{{ returnLabel }}</label>
                 <div class="date-value">
                     {{ formatDisplayDate(modelValue.returnDate) }}
@@ -18,14 +20,14 @@
             </div>
         </div>
 
-        <div v-if="isOpen" class="calendar-popup">
+        <div v-if="isOpen" class="calendar-popup" role="dialog" aria-label="Date picker calendar">
             <div class="calendar-header">
-                <button type="button" @click="previousMonth" class="month-nav">‹</button>
+                <button type="button" @click="previousMonth" class="month-nav" aria-label="Previous month">‹</button>
                 <div class="month-display">
                     <span class="month-name">{{ currentMonthName }}</span>
                     <span class="year">{{ currentYear }}</span>
                 </div>
-                <button type="button" @click="nextMonth" class="month-nav">›</button>
+                <button type="button" @click="nextMonth" class="month-nav" aria-label="Next month">›</button>
             </div>
 
             <div class="calendars">

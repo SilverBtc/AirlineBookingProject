@@ -86,8 +86,34 @@ async function getFlightById(id) {
     return data;
 }
 
+async function getOccupiedSeats(flightId) {
+    // Get all bookings for this flight
+    const { data, error } = await supabase
+        .from('bookings')
+        .select('seat_number')
+        .eq('flight_id', flightId)
+        .in('status', ['CONFIRMED', 'PENDING']);
+
+    if (error) {
+        console.error('getOccupiedSeats error', error);
+        throw error;
+    }
+
+    // Extract seat numbers (handle comma-separated values)
+    const occupiedSeats = [];
+    data.forEach(booking => {
+        if (booking.seat_number) {
+            const seats = booking.seat_number.split(',').map(s => s.trim());
+            occupiedSeats.push(...seats);
+        }
+    });
+
+    return occupiedSeats;
+}
+
 module.exports = {
     getAllFlights,
     getFlightById,
-    getDestinations
+    getDestinations,
+    getOccupiedSeats
 };

@@ -6,6 +6,7 @@ const { authenticate } = require('../middleware/auth');
 
 router.get('/search', flightController.searchFlights);
 router.get('/destinations', flightController.getDestinations);
+router.get('/:id/occupied-seats', flightController.getOccupiedSeats);
 router.get('/:id', flightController.getFlight);
 
 module.exports = router;

@@ -45,6 +45,9 @@ export const flightAPI = {
     },
     getDestinations() {
         return apiClient.get('/api/flights/destinations')
+    },
+    getOccupiedSeats(flightId) {
+        return apiClient.get(`/api/flights/${flightId}/occupied-seats`)
     }
 }
 

@@ -286,7 +286,7 @@ const selectOutboundFlight = (flight) => {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
         // One way, go directly to booking
-        goToBooking(flight, null)
+        goToBooking(flight)
     }
 }
 
@@ -295,7 +295,7 @@ const selectReturnFlight = (flight) => {
     goToBooking(selectedOutboundFlight.value, flight)
 }
 
-const goToBooking = (outboundFlight, returnFlight) => {
+const goToBooking = (outboundFlight, returnFlight = null) => {
     const totalPrice = (outboundFlight.price + (returnFlight?.price || 0)).toFixed(2)
     router.push({
         name: 'booking',
@@ -307,7 +307,8 @@ const goToBooking = (outboundFlight, returnFlight) => {
             departDate: departDate.value,
             returnDate: returnDate.value,
             passengers: passengers.value,
-            price: totalPrice
+            price: totalPrice,
+            travelClass: travelClass.value
         }
     })
 }

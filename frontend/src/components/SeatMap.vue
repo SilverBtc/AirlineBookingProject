@@ -4,6 +4,12 @@
             <h3>Select Your Seats</h3>
             <p>{{ selectedSeats.length }} of {{ passengersCount }} seat(s) selected</p>
             <p class="seat-pricing-info" v-if="totalSeatPrice > 0">Seat selection fee: ${{ totalSeatPrice }}</p>
+            <button @click="assignRandomSeats" class="random-seats-btn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 2V14M2 8H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Assign Free Random Seats
+            </button>
         </div>
 
         <div class="seat-legend">
@@ -49,7 +55,7 @@
                     <div v-for="row in firstClassRows" :key="row" class="seat-row first-class">
                         <div class="row-number">{{ row }}</div>
                         <div class="seats-group left">
-                            <button v-for="seat in ['A', 'C']" :key="`${row}${seat}`"
+                            <button type="button" v-for="seat in ['A', 'C']" :key="`${row}${seat}`"
                                 :class="getSeatClass(row, seat)" @click="selectSeat(row, seat)"
                                 :disabled="isSeatOccupied(row, seat)" 
                                 :aria-label="`Seat ${row}${seat} - First Class - $75`">
@@ -58,7 +64,7 @@
                         </div>
                         <div class="aisle"></div>
                         <div class="seats-group right">
-                            <button v-for="seat in ['D', 'F']" :key="`${row}${seat}`"
+                            <button type="button" v-for="seat in ['D', 'F']" :key="`${row}${seat}`"
                                 :class="getSeatClass(row, seat)" @click="selectSeat(row, seat)"
                                 :disabled="isSeatOccupied(row, seat)" 
                                 :aria-label="`Seat ${row}${seat} - First Class - $75`">
@@ -76,7 +82,7 @@
                     <div v-for="row in businessClassRows" :key="row" class="seat-row business">
                         <div class="row-number">{{ row }}</div>
                         <div class="seats-group left">
-                            <button v-for="seat in ['A', 'C']" :key="`${row}${seat}`"
+                            <button type="button" v-for="seat in ['A', 'C']" :key="`${row}${seat}`"
                                 :class="getSeatClass(row, seat)" @click="selectSeat(row, seat)"
                                 :disabled="isSeatOccupied(row, seat)" 
                                 :aria-label="`Seat ${row}${seat} - Business Class - $50`">
@@ -85,7 +91,7 @@
                         </div>
                         <div class="aisle"></div>
                         <div class="seats-group right">
-                            <button v-for="seat in ['D', 'F']" :key="`${row}${seat}`"
+                            <button type="button" v-for="seat in ['D', 'F']" :key="`${row}${seat}`"
                                 :class="getSeatClass(row, seat)" @click="selectSeat(row, seat)"
                                 :disabled="isSeatOccupied(row, seat)" 
                                 :aria-label="`Seat ${row}${seat} - Business Class - $50`">
@@ -103,7 +109,7 @@
                     <div v-for="row in premiumEconomyRows" :key="row" class="seat-row premium-economy">
                         <div class="row-number">{{ row }}</div>
                         <div class="seats-group left">
-                            <button v-for="seat in ['A', 'B', 'C']" :key="`${row}${seat}`"
+                            <button type="button" v-for="seat in ['A', 'B', 'C']" :key="`${row}${seat}`"
                                 :class="getSeatClass(row, seat)" @click="selectSeat(row, seat)"
                                 :disabled="isSeatOccupied(row, seat)" 
                                 :aria-label="`Seat ${row}${seat} - Premium Economy - $35`">
@@ -112,7 +118,7 @@
                         </div>
                         <div class="aisle"></div>
                         <div class="seats-group right">
-                            <button v-for="seat in ['D', 'E', 'F']" :key="`${row}${seat}`"
+                            <button type="button" v-for="seat in ['D', 'E', 'F']" :key="`${row}${seat}`"
                                 :class="getSeatClass(row, seat)" @click="selectSeat(row, seat)"
                                 :disabled="isSeatOccupied(row, seat)" 
                                 :aria-label="`Seat ${row}${seat} - Premium Economy - $35`">
@@ -131,7 +137,7 @@
                     <div v-for="row in economyRows" :key="row" class="seat-row economy">
                         <div class="row-number">{{ row }}</div>
                         <div class="seats-group left">
-                            <button v-for="seat in ['A', 'B', 'C']" :key="`${row}${seat}`"
+                            <button type="button" v-for="seat in ['A', 'B', 'C']" :key="`${row}${seat}`"
                                 :class="getSeatClass(row, seat)" @click="selectSeat(row, seat)"
                                 :disabled="isSeatOccupied(row, seat)" :aria-label="`Seat ${row}${seat}`">
                                 {{ seat }}
@@ -139,7 +145,7 @@
                         </div>
                         <div class="aisle"></div>
                         <div class="seats-group right">
-                            <button v-for="seat in ['D', 'E', 'F']" :key="`${row}${seat}`"
+                            <button type="button" v-for="seat in ['D', 'E', 'F']" :key="`${row}${seat}`"
                                 :class="getSeatClass(row, seat)" @click="selectSeat(row, seat)"
                                 :disabled="isSeatOccupied(row, seat)" :aria-label="`Seat ${row}${seat}`">
                                 {{ seat }}
@@ -164,6 +170,14 @@ const props = defineProps({
     passengersCount: {
         type: Number,
         required: true
+    },
+    travelClass: {
+        type: String,
+        default: 'economy'
+    },
+    occupiedSeats: {
+        type: Array,
+        default: () => []
     }
 })
 
@@ -186,11 +200,11 @@ const seatPricing = {
     economy: 0
 }
 
-const occupiedSeats = ref([
-    '10A', '10B', '12C', '12D', '14E', '14F', '17A', '17F',
-    '20B', '20C', '20D', '23A', '23F', '27C', '27D',
-    '1A', '2C', '4D', '5F', '7A', '8C'
-])
+const occupiedSeats = ref([...props.occupiedSeats])
+
+watch(() => props.occupiedSeats, (newVal) => {
+    occupiedSeats.value = [...newVal]
+}, { deep: true })
 
 const isSeatOccupied = (row, seat) => {
     return occupiedSeats.value.includes(`${row}${seat}`)
@@ -202,6 +216,29 @@ const isSeatSelected = (row, seat) => {
 
 const isExitRow = (row) => {
     return exitRows.includes(row)
+}
+
+const getSeatClassCategory = (row) => {
+    if (firstClassRows.includes(row)) return 'first'
+    if (businessClassRows.includes(row)) return 'business'
+    if (premiumEconomyRows.includes(row)) return 'premium'
+    return 'economy'
+}
+
+const canSelectSeat = (row) => {
+    const seatClass = getSeatClassCategory(row)
+    const travelClass = props.travelClass.toLowerCase()
+    
+    // Business class can only select business or first class (NOT lower classes)
+    // First class can only select first class (NOT lower classes)
+    const allowedClasses = {
+        'economy': ['economy', 'premium', 'business', 'first'], // Economy can upgrade
+        'premium': ['premium', 'business', 'first'], // Premium cannot downgrade to economy
+        'business': ['business', 'first'], // Business cannot downgrade
+        'first': ['first'] // First class only
+    }
+    
+    return allowedClasses[travelClass]?.includes(seatClass) || false
 }
 
 const getSeatPrice = (row) => {
@@ -227,6 +264,8 @@ const getSeatClass = (row, seat) => {
         classes.push('occupied')
     } else if (isSeatSelected(row, seat)) {
         classes.push('selected')
+    } else if (!canSelectSeat(row)) {
+        classes.push('not-allowed')
     } else {
         classes.push('available')
     }
@@ -247,7 +286,7 @@ const getSeatClass = (row, seat) => {
 const selectSeat = (row, seat) => {
     const seatCode = `${row}${seat}`
 
-    if (isSeatOccupied(row, seat)) return
+    if (isSeatOccupied(row, seat) || !canSelectSeat(row)) return
 
     const index = selectedSeats.value.indexOf(seatCode)
 
@@ -258,15 +297,35 @@ const selectSeat = (row, seat) => {
         // Select seat if limit not reached
         if (selectedSeats.value.length < props.passengersCount) {
             selectedSeats.value.push(seatCode)
-        } else {
-            // Silently replace the oldest selected seat if limit reached
-            selectedSeats.value.shift()
-            selectedSeats.value.push(seatCode)
         }
     }
 
     emit('update:modelValue', selectedSeats.value)
     emit('update:seatPrice', totalSeatPrice.value)
+}
+
+const assignRandomSeats = () => {
+    // Clear current selection
+    selectedSeats.value = []
+    
+    // Get all available economy seats (free seats)
+    const availableEconomySeats = []
+    
+    economyRows.forEach(row => {
+        ['A', 'B', 'C', 'D', 'E', 'F'].forEach(seat => {
+            const seatCode = `${row}${seat}`
+            if (!isSeatOccupied(row, seat) && !isExitRow(row)) {
+                availableEconomySeats.push(seatCode)
+            }
+        })
+    })
+    
+    // Shuffle and select required number of seats
+    const shuffled = availableEconomySeats.sort(() => Math.random() - 0.5)
+    selectedSeats.value = shuffled.slice(0, props.passengersCount)
+    
+    emit('update:modelValue', selectedSeats.value)
+    emit('update:seatPrice', 0) // Random seats are free (economy)
 }
 
 watch(() => props.modelValue, (newValue) => {
@@ -315,6 +374,32 @@ watch(totalSeatPrice, (newPrice) => {
     font-weight: 600;
     color: #1967d2;
     margin-top: 4px;
+}
+
+.random-seats-btn {
+    margin-top: 12px;
+    padding: 10px 20px;
+    background: #34a853;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.random-seats-btn:hover {
+    background: #2d9249;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(52, 168, 83, 0.3);
+}
+
+.random-seats-btn svg {
+    transform: rotate(45deg);
 }
 
 .seat-legend {
@@ -512,6 +597,14 @@ watch(totalSeatPrice, (newPrice) => {
     border-color: #9e9e9e;
     color: #9e9e9e;
     cursor: not-allowed;
+}
+
+.seat.not-allowed {
+    background: #f5f5f5;
+    border-color: #e0e0e0;
+    color: #bdbdbd;
+    cursor: not-allowed;
+    opacity: 0.4;
 }
 
 .seat.extra-legroom.available {

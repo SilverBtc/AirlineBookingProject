@@ -1238,6 +1238,15 @@
     color: white;
 }
 
+.progress-step.completed .step-number {
+    background: #4caf50;
+    color: white;
+}
+
+.progress-step.completed .step-label {
+    color: #4caf50;
+}
+
 .progress-line {
     width: 80px;
     height: 2px;

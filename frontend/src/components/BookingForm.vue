@@ -2,153 +2,167 @@
     <div class="booking-page">
         <div class="booking-container">
             <div class="booking-progress">
-                <div class="progress-step active">
+                <div :class="['progress-step', { active: currentStep >= 1, completed: currentStep > 1 }]">
                     <div class="step-number">1</div>
                     <div class="step-label">Passenger Details</div>
                 </div>
                 <div class="progress-line"></div>
-                <div class="progress-step">
+                <div :class="['progress-step', { active: currentStep >= 2, completed: currentStep > 2 }]">
                     <div class="step-number">2</div>
+                    <div class="step-label">Seat Selection</div>
+                </div>
+                <div class="progress-line"></div>
+                <div :class="['progress-step', { active: currentStep >= 3, completed: currentStep > 3 }]">
+                    <div class="step-number">3</div>
                     <div class="step-label">Payment</div>
                 </div>
                 <div class="progress-line"></div>
-                <div class="progress-step">
-                    <div class="step-number">3</div>
+                <div :class="['progress-step', { active: currentStep >= 4 }]">
+                    <div class="step-number">4</div>
                     <div class="step-label">Confirmation</div>
                 </div>
             </div>
 
             <div class="booking-content">
                 <div class="booking-form">
-                    <h2>Complete Your Booking</h2>
+                    <h2>{{ stepTitles[currentStep - 1] }}</h2>
 
-                    <form @submit.prevent="submitBooking">
-                        <!-- Passenger Information -->
-                        <section class="form-section">
-                            <h3>Passenger Information</h3>
+                    <form @submit.prevent="handleNext">
+                        <div v-if="currentStep === 1">
+                            <section class="form-section">
+                                <h3>Passenger Information</h3>
 
-                            <div v-for="(passenger, index) in passengers" :key="index" class="passenger-form">
-                                <h4>Passenger {{ index + 1 }}</h4>
+                                <div v-for="(passenger, index) in passengers" :key="index" class="passenger-form">
+                                    <h4>Passenger {{ index + 1 }}</h4>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label :for="`title-${index}`">Title *</label>
+                                            <select :id="`title-${index}`" v-model="passenger.title" required>
+                                                <option value="">Select</option>
+                                                <option value="Mr">Mr</option>
+                                                <option value="Ms">Ms</option>
+                                                <option value="Mrs">Mrs</option>
+                                                <option value="Dr">Dr</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label :for="`firstName-${index}`">First Name *</label>
+                                            <input type="text" :id="`firstName-${index}`" v-model="passenger.firstName"
+                                                placeholder="First Name" required />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label :for="`lastName-${index}`">Last Name *</label>
+                                            <input type="text" :id="`lastName-${index}`" v-model="passenger.lastName"
+                                                placeholder="Last Name" required />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label :for="`dob-${index}`">Date of Birth *</label>
+                                            <input type="date" :id="`dob-${index}`" v-model="passenger.dateOfBirth"
+                                                :max="maxDate" required />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label :for="`passport-${index}`">Passport Number *</label>
+                                            <input type="text" :id="`passport-${index}`" v-model="passenger.passportNumber"
+                                                placeholder="Passport Number" required />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label :for="`nationality-${index}`">Nationality *</label>
+                                            <input type="text" :id="`nationality-${index}`" v-model="passenger.nationality"
+                                                placeholder="Nationality" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="form-section">
+                                <h3>Contact Information</h3>
 
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label :for="`title-${index}`">Title *</label>
-                                        <select :id="`title-${index}`" v-model="passenger.title" required>
-                                            <option value="">Select</option>
-                                            <option value="Mr">Mr</option>
-                                            <option value="Ms">Ms</option>
-                                            <option value="Mrs">Mrs</option>
-                                            <option value="Dr">Dr</option>
-                                        </select>
+                                        <label for="email">Email Address *</label>
+                                        <input type="email" id="email" v-model="contactInfo.email"
+                                            placeholder="your.email@example.com" required />
                                     </div>
 
                                     <div class="form-group">
-                                        <label :for="`firstName-${index}`">First Name *</label>
-                                        <input type="text" :id="`firstName-${index}`" v-model="passenger.firstName"
-                                            placeholder="First Name" required />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label :for="`lastName-${index}`">Last Name *</label>
-                                        <input type="text" :id="`lastName-${index}`" v-model="passenger.lastName"
-                                            placeholder="Last Name" required />
+                                        <label for="phone">Phone Number *</label>
+                                        <input type="tel" id="phone" v-model="contactInfo.phone"
+                                            placeholder="+1 (555) 123-4567" required />
                                     </div>
                                 </div>
+                            </section>
+                        </div>
 
-                                <div class="form-row">
+                        <div v-if="currentStep === 2">
+                            <section class="form-section">
+                                <SeatMap v-model="selectedSeats" :passengers-count="passengerCount" 
+                                    @update:seatPrice="updateSeatPrice" />
+                            </section>
+                        </div>
+
+                        <div v-if="currentStep === 3">
+                            <section class="form-section">
+                                <h3>Payment Information</h3>
+
+                                <div class="card-payment-form">
                                     <div class="form-group">
-                                        <label :for="`dob-${index}`">Date of Birth *</label>
-                                        <input type="date" :id="`dob-${index}`" v-model="passenger.dateOfBirth"
-                                            :max="maxDate" required />
+                                        <label for="cardNumber">Card Number *</label>
+                                        <input type="text" id="cardNumber" v-model="paymentInfo.cardNumber"
+                                            @input="formatCardNumber" placeholder="1234 5678 9012 3456" maxlength="19"
+                                            required />
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="cardName">Name on Card *</label>
+                                            <input type="text" id="cardName" v-model="paymentInfo.cardName"
+                                                placeholder="John Doe" required />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="expiry">Expiry Date *</label>
+                                            <input type="text" id="expiry" v-model="paymentInfo.expiryDate"
+                                                @input="formatExpiry" placeholder="MM/YY" maxlength="5" required />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="cvv">CVV *</label>
+                                            <input type="text" id="cvv" v-model="paymentInfo.cvv" placeholder="123"
+                                                maxlength="4" required />
+                                        </div>
                                     </div>
 
                                     <div class="form-group">
-                                        <label :for="`passport-${index}`">Passport Number *</label>
-                                        <input type="text" :id="`passport-${index}`" v-model="passenger.passportNumber"
-                                            placeholder="Passport Number" required />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label :for="`nationality-${index}`">Nationality *</label>
-                                        <input type="text" :id="`nationality-${index}`" v-model="passenger.nationality"
-                                            placeholder="Nationality" required />
+                                        <label for="billingAddress">Billing Address *</label>
+                                        <input type="text" id="billingAddress" v-model="paymentInfo.billingAddress"
+                                            placeholder="123 Main St, City, Country" required />
                                     </div>
                                 </div>
-                            </div>
-                        </section>
-
-                        <!-- Contact Information -->
-                        <section class="form-section">
-                            <h3>Contact Information</h3>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="email">Email Address *</label>
-                                    <input type="email" id="email" v-model="contactInfo.email"
-                                        placeholder="your.email@example.com" required />
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="phone">Phone Number *</label>
-                                    <input type="tel" id="phone" v-model="contactInfo.phone"
-                                        placeholder="+1 (555) 123-4567" required />
-                                </div>
-                            </div>
-                        </section>
-
-
-
-
-
-                        <!-- Payment Information -->
-                        <section class="form-section">
-                            <h3>Payment Information</h3>
-
-                            <div class="card-payment-form">
-                                <div class="form-group">
-                                    <label for="cardNumber">Card Number *</label>
-                                    <input type="text" id="cardNumber" v-model="paymentInfo.cardNumber"
-                                        @input="formatCardNumber" placeholder="1234 5678 9012 3456" maxlength="19"
-                                        required />
-                                </div>
-
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="cardName">Name on Card *</label>
-                                        <input type="text" id="cardName" v-model="paymentInfo.cardName"
-                                            placeholder="John Doe" required />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="expiry">Expiry Date *</label>
-                                        <input type="text" id="expiry" v-model="paymentInfo.expiryDate"
-                                            @input="formatExpiry" placeholder="MM/YY" maxlength="5" required />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="cvv">CVV *</label>
-                                        <input type="text" id="cvv" v-model="paymentInfo.cvv" placeholder="123"
-                                            maxlength="4" required />
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="billingAddress">Billing Address *</label>
-                                    <input type="text" id="billingAddress" v-model="paymentInfo.billingAddress"
-                                        placeholder="123 Main St, City, Country" required />
-                                </div>
-                            </div>
-                        </section>
+                            </section>
+                        </div>
 
                         <div class="form-actions">
-                            <button type="button" @click="goBack" class="back-button" :disabled="isSubmitting">
+                            <button type="button" v-if="currentStep > 1" @click="previousStep" class="back-button">
+                                ← Previous
+                            </button>
+                            <button type="button" v-if="currentStep === 1" @click="goBack" class="back-button">
                                 Back to Results
                             </button>
-                            <button type="button" @click="fillTestData" class="test-button" :disabled="isSubmitting">
+                            <button type="button" v-if="currentStep === 1" @click="fillTestData" class="test-button" 
+                                :disabled="isSubmitting">
                                 🎲 Fill Test Data
                             </button>
                             <button type="submit" class="submit-button" :disabled="isSubmitting">
-                                <span v-if="!isSubmitting">Complete Booking - ${{ totalPrice.toFixed(2) }}</span>
+                                <span v-if="currentStep < 3">Continue →</span>
+                                <span v-else-if="!isSubmitting">Complete Booking - ${{ totalPrice.toFixed(2) }}</span>
                                 <span v-else class="submitting-content">
                                     <span class="spinner-small"></span>
                                     Processing...
@@ -164,7 +178,6 @@
                     <div class="summary-section">
                         <h4>Flight Details</h4>
 
-                        <!-- Outbound Flight -->
                         <div class="flight-detail-card">
                             <div class="flight-label">
                                 <span class="flight-icon">✈</span>
@@ -180,7 +193,6 @@
                             </div>
                         </div>
 
-                        <!-- Return Flight (if roundtrip) -->
                         <div v-if="isRoundTrip" class="flight-detail-card return-flight">
                             <div class="flight-label">
                                 <span class="flight-icon">✈</span>
@@ -200,6 +212,10 @@
                             <span>Passengers:</span>
                             <span class="passenger-count">{{ passengerCount }}</span>
                         </div>
+                        <div class="summary-row" v-if="selectedSeats.length > 0">
+                            <span>Selected Seats:</span>
+                            <span class="seat-numbers">{{ selectedSeats.join(', ') }}</span>
+                        </div>
                     </div>
 
                     <div class="summary-section">
@@ -211,6 +227,10 @@
                         <div class="summary-row">
                             <span>Taxes & Fees:</span>
                             <span>${{ taxes }}</span>
+                        </div>
+                        <div class="summary-row" v-if="seatSelectionPrice > 0">
+                            <span>Seat Selection:</span>
+                            <span>${{ seatSelectionPrice }}</span>
                         </div>
                         <div class="summary-divider"></div>
                         <div class="summary-row total">
@@ -237,7 +257,6 @@
             </div>
         </div>
 
-        <!-- Terms Modal -->
         <div v-if="showTerms" class="modal-overlay" @click="showTerms = false">
             <div class="modal-content" @click.stop>
                 <h3>Terms and Conditions</h3>
@@ -268,9 +287,17 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { bookingAPI } from '../services/api'
+import SeatMap from './SeatMap.vue'
 
 const router = useRouter()
 const route = useRoute()
+
+const currentStep = ref(1)
+const stepTitles = [
+    'Passenger Details',
+    'Select Your Seats',
+    'Payment Information'
+]
 
 const origin = ref(route.query.origin || '')
 const destination = ref(route.query.destination || '')
@@ -286,6 +313,9 @@ const contactInfo = ref({
     email: '',
     phone: ''
 })
+
+const selectedSeats = ref([])
+const seatSelectionPrice = ref(0)
 
 const specialRequests = ref({
     wheelchairAssistance: false,
@@ -333,11 +363,46 @@ const taxes = computed(() => {
 })
 
 const totalPrice = computed(() => {
-    return basePrice.value * passengerCount.value + taxes.value
+    return basePrice.value * passengerCount.value + taxes.value + seatSelectionPrice.value
 })
 
+const updateSeatPrice = (price) => {
+    seatSelectionPrice.value = price
+}
+
+const handleNext = () => {
+    if (currentStep.value === 1) {
+        const allFieldsFilled = passengers.value.every(p =>
+            p.title && p.firstName && p.lastName && p.dateOfBirth &&
+            p.passportNumber && p.nationality
+        )
+
+        if (!allFieldsFilled || !contactInfo.value.email || !contactInfo.value.phone) {
+            alert('Please fill in all required fields')
+            return
+        }
+        currentStep.value = 2
+        window.scrollTo(0, 0)
+    } else if (currentStep.value === 2) {
+        if (selectedSeats.value.length !== passengerCount.value) {
+            alert(`Please select ${passengerCount.value} seat(s) for your flight`)
+            return
+        }
+        currentStep.value = 3
+        window.scrollTo(0, 0)
+    } else if (currentStep.value === 3) {
+        submitBooking()
+    }
+}
+
+const previousStep = () => {
+    if (currentStep.value > 1) {
+        currentStep.value--
+        window.scrollTo(0, 0)
+    }
+}
+
 onMounted(() => {
-    // Check if user is logged in
     const user = localStorage.getItem('user')
     if (!user) {
         alert('You have to be registered and logged in in order to complete booking')
@@ -345,7 +410,6 @@ onMounted(() => {
         return
     }
 
-    // Initialize passenger forms
     for (let i = 0; i < passengerCount.value; i++) {
         passengers.value.push({
             title: '',
@@ -359,26 +423,14 @@ onMounted(() => {
 })
 
 const submitBooking = async () => {
-    // Empêcher les soumissions multiples
     if (isSubmitting.value) return
-
-    // Validate all required fields
-    const allFieldsFilled = passengers.value.every(p =>
-        p.title && p.firstName && p.lastName && p.dateOfBirth &&
-        p.passportNumber && p.nationality
-    )
-
-    if (!allFieldsFilled || !contactInfo.value.email || !contactInfo.value.phone) {
-        alert('Please fill in all required fields')
-        return
-    }
 
     isSubmitting.value = true
 
     try {
         const bookingData = {
             flight_id: route.query.flightId,
-            seat_number: '12A',
+            seats: selectedSeats.value,
             passengers: passengers.value,
             contact_info: contactInfo.value,
             payment_info: paymentInfo.value,
@@ -392,7 +444,6 @@ const submitBooking = async () => {
 
         console.log('Navigating to confirmation with ref:', bookingReference)
 
-        // Navigate to confirmation page
         router.push({
             name: 'confirmation',
             query: {
@@ -420,19 +471,16 @@ const goBack = () => {
 }
 
 const fillTestData = () => {
-    // Random names
     const firstNames = ['John', 'Emma', 'Michael', 'Sarah', 'David', 'Lisa', 'James', 'Emily', 'Robert', 'Anna']
     const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Martinez', 'Wilson']
     const titles = ['Mr', 'Ms', 'Mrs', 'Dr']
     const nationalities = ['USA', 'UK', 'Canada', 'Australia', 'France', 'Germany', 'Spain', 'Italy', 'Japan', 'China']
 
-    // Fill passengers with random data
     passengers.value.forEach(passenger => {
         passenger.title = titles[Math.floor(Math.random() * titles.length)]
         passenger.firstName = firstNames[Math.floor(Math.random() * firstNames.length)]
         passenger.lastName = lastNames[Math.floor(Math.random() * lastNames.length)]
 
-        // Random date of birth (between 18 and 70 years ago)
         const yearsAgo = 18 + Math.floor(Math.random() * 52)
         const birthDate = new Date()
         birthDate.setFullYear(birthDate.getFullYear() - yearsAgo)
@@ -440,20 +488,16 @@ const fillTestData = () => {
         birthDate.setDate(Math.floor(Math.random() * 28) + 1)
         passenger.dateOfBirth = birthDate.toISOString().split('T')[0]
 
-        // Random passport number
         passenger.passportNumber = 'P' + Math.random().toString(36).substr(2, 8).toUpperCase()
         passenger.nationality = nationalities[Math.floor(Math.random() * nationalities.length)]
     })
 
-    // Fill contact info
     contactInfo.value.email = `test${Math.floor(Math.random() * 9999)}@example.com`
     contactInfo.value.phone = `+1 (${Math.floor(Math.random() * 900) + 100}) ${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`
 
-    // Fill payment info with test card
     paymentInfo.value.cardNumber = '4532 1234 5678 9010'
     paymentInfo.value.cardName = passengers.value[0].firstName + ' ' + passengers.value[0].lastName
 
-    // Random expiry date (future date)
     const month = Math.floor(Math.random() * 12) + 1
     const year = new Date().getFullYear() % 100 + Math.floor(Math.random() * 5) + 1
     paymentInfo.value.expiryDate = `${month.toString().padStart(2, '0')}/${year}`

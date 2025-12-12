@@ -20,7 +20,6 @@
 
             <div v-else-if="bookings.length === 0" class="no-bookings">
                 <div class="empty-state">
-                    <div class="empty-icon">✈️</div>
                     <h2>No trips yet</h2>
                     <p>When you book a flight, you'll see it here</p>
                     <button @click="goToSearch" class="search-btn">Search flights</button>

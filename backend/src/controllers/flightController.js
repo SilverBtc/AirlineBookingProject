@@ -57,8 +57,20 @@ async function getDestinations(req, res) {
     }
 }
 
+async function getOccupiedSeats(req, res) {
+    try {
+        const { id } = req.params;
+        const occupiedSeats = await flightModel.getOccupiedSeats(id);
+        res.json(occupiedSeats);
+    } catch (err) {
+        console.error('getOccupiedSeats error', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+
 module.exports = {
     searchFlights,
     getFlight,
-    getDestinations
+    getDestinations,
+    getOccupiedSeats
 };

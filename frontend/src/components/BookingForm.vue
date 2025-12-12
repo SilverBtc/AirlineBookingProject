@@ -103,8 +103,18 @@
 
                         <div v-if="currentStep === 2">
                             <section class="form-section">
-                                <SeatMap v-model="selectedSeats" :passengers-count="passengerCount" 
-                                    @update:seatPrice="updateSeatPrice" />
+                                <div v-if="loadingSeats" class="loading-container">
+                                    <div class="loading-spinner"></div>
+                                    <p>Loading seat availability...</p>
+                                </div>
+                                <SeatMap 
+                                    v-else
+                                    v-model="selectedSeats" 
+                                    :passengersCount="passengerCount" 
+                                    :travelClass="travelClass"
+                                    :occupiedSeats="occupiedSeats"
+                                    @update:seatPrice="updateSeatPrice" 
+                                />
                             </section>
                         </div>
 
@@ -160,7 +170,8 @@
                                 :disabled="isSubmitting">
                                 🎲 Fill Test Data
                             </button>
-                            <button type="submit" class="submit-button" :disabled="isSubmitting">
+                            <button type="submit" class="submit-button" 
+                                :disabled="isSubmitting || (currentStep === 2 && selectedSeats.length !== passengerCount)">
                                 <span v-if="currentStep < 3">Continue →</span>
                                 <span v-else-if="!isSubmitting">Complete Booking - ${{ totalPrice.toFixed(2) }}</span>
                                 <span v-else class="submitting-content">
@@ -286,7 +297,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { bookingAPI } from '../services/api'
+import { bookingAPI, flightAPI } from '../services/api'
 import SeatMap from './SeatMap.vue'
 
 const router = useRouter()
@@ -307,6 +318,7 @@ const returnFlightId = ref(route.query.returnFlightId || null)
 const isRoundTrip = computed(() => !!returnFlightId.value && !!returnDate.value)
 const passengerCount = ref(parseInt(route.query.passengers) || 1)
 const basePrice = ref(parseFloat(route.query.price) || 0)
+const travelClass = ref(route.query.travelClass || 'economy')
 
 const passengers = ref([])
 const contactInfo = ref({
@@ -314,8 +326,11 @@ const contactInfo = ref({
     phone: ''
 })
 
+// Seat selection
 const selectedSeats = ref([])
 const seatSelectionPrice = ref(0)
+const occupiedSeats = ref([])
+const loadingSeats = ref(false)
 
 const specialRequests = ref({
     wheelchairAssistance: false,
@@ -382,16 +397,29 @@ const handleNext = () => {
             return
         }
         currentStep.value = 2
+        loadOccupiedSeats() // Load seats when entering step 2
         window.scrollTo(0, 0)
     } else if (currentStep.value === 2) {
-        if (selectedSeats.value.length !== passengerCount.value) {
-            alert(`Please select ${passengerCount.value} seat(s) for your flight`)
-            return
-        }
         currentStep.value = 3
         window.scrollTo(0, 0)
     } else if (currentStep.value === 3) {
         submitBooking()
+    }
+}
+
+const loadOccupiedSeats = async () => {
+    const flightId = route.query.flightId
+    if (!flightId) return
+    
+    loadingSeats.value = true
+    try {
+        const response = await flightAPI.getOccupiedSeats(flightId)
+        occupiedSeats.value = response.data || []
+    } catch (error) {
+        console.error('Error loading occupied seats:', error)
+        occupiedSeats.value = []
+    } finally {
+        loadingSeats.value = false
     }
 }
 
@@ -430,7 +458,7 @@ const submitBooking = async () => {
     try {
         const bookingData = {
             flight_id: route.query.flightId,
-            seats: selectedSeats.value,
+            seat_number: selectedSeats.value.join(','),
             passengers: passengers.value,
             contact_info: contactInfo.value,
             payment_info: paymentInfo.value,

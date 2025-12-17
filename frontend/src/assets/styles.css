@@ -2413,10 +2413,69 @@
     font-weight: 500;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+    .header-content {
+        padding: 0 16px;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .main-nav {
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .booking-content {
+        grid-template-columns: 1fr 320px;
+    }
+
     .booking-form .form-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .booking-progress {
+        flex-wrap: wrap;
         gap: 12px;
+    }
+
+    .progress-line {
+        width: 40px;
+    }
+
+    .flight-search {
+        padding: 24px 16px;
+    }
+
+    .search-card {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .main-nav {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-start;
+    }
+
+    .user-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .booking-page {
+        padding: 16px;
     }
 
     .booking-content {
@@ -2427,8 +2486,85 @@
         order: -1;
     }
 
+    .booking-form .form-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
     .payment-methods {
         grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .booking-progress {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .progress-line {
+        display: none;
+    }
+
+    .trip-selector {
+        flex-wrap: wrap;
+    }
+
+    .main-inputs {
+        grid-template-columns: 1fr;
+    }
+
+    .input-group.from-to {
+        flex-direction: column;
+        border: 1px solid #dadce0;
+    }
+
+    .input-group.from-to .input-wrapper {
+        border-right: none;
+        border-bottom: 1px solid #dadce0;
+    }
+
+    .input-group.from-to .input-wrapper:last-child {
+        border-bottom: none;
+    }
+
+    .search-card {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: 20px;
+    }
+
+    .nav-link {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+
+    .step-number {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .progress-step .step-label {
+        font-size: 12px;
+    }
+
+    .form-actions button {
+        width: 100%;
+    }
+
+    .summary-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
     }
 }
 
@@ -2451,32 +2587,4 @@
 
 .form-group.checkbox a:hover {
     text-decoration: underline;
-}
-
-@media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .main-nav {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .results-container {
-        grid-template-columns: 1fr;
-    }
-
-    .flight-info {
-        grid-template-columns: 1fr;
-    }
-
-    .booking-content {
-        grid-template-columns: 1fr;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
 }

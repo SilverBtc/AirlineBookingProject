@@ -32,9 +32,27 @@
                             <div class="detail-label">Date</div>
                             <div class="detail-value">{{ formatDate(departDate) }}</div>
                         </div>
+                        <div class="detail-item" v-if="airline">
+                            <div class="detail-label">Airline</div>
+                            <div class="detail-value">{{ airline }}</div>
+                        </div>
+                        <div class="detail-item" v-if="flightNumber">
+                            <div class="detail-label">Flight Number</div>
+                            <div class="detail-value">{{ flightNumber }}</div>
+                        </div>
                         <div class="detail-item">
                             <div class="detail-label">Passengers</div>
                             <div class="detail-value">{{ passengers }}</div>
+                        </div>
+                        <div class="detail-item" v-if="seatNumber">
+                            <div class="detail-label">Seat(s)</div>
+                            <div class="detail-value">{{ seatNumber }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value">
+                                <span :class="['status-badge', status]">{{ status }}</span>
+                            </div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Total Paid</div>
@@ -42,8 +60,6 @@
                         </div>
                     </div>
                 </section>
-
-
             </div>
 
             <div class="confirmation-info-box">
@@ -70,21 +86,53 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { bookingAPI } from '../services/api'
 
 const router = useRouter()
 const route = useRoute()
 
 const bookingRef = ref(route.query.bookingRef || '')
+const bookingId = ref(route.query.bookingId || '')
 const origin = ref(route.query.origin || '')
 const destination = ref(route.query.destination || '')
 const departDate = ref(route.query.departDate || '')
 const passengers = ref(route.query.passengers || 1)
 const total = ref(route.query.total || 0)
 const email = ref(route.query.email || '')
+const airline = ref(route.query.airline || '')
+const flightNumber = ref(route.query.flightNumber || '')
+const seatNumber = ref(route.query.seatNumber || '')
+const status = ref(route.query.status || 'confirmed')
 const fromBooking = ref(route.query.fromBooking === 'true')
 
 const copied = ref(false)
 const redirectCountdown = ref(5)
+const loading = ref(false)
+
+const fetchBookingDetails = async () => {
+    if (!bookingId.value) return
+    
+    loading.value = true
+    try {
+        const response = await bookingAPI.getById(bookingId.value)
+        const booking = response.data
+        
+        // Update refs with backend data
+        bookingRef.value = booking.booking_reference || `BK${booking.id}`
+        origin.value = booking.flight?.origin || origin.value
+        destination.value = booking.flight?.destination || destination.value
+        departDate.value = booking.flight?.departure_time || departDate.value
+        airline.value = booking.flight?.airline || airline.value
+        flightNumber.value = booking.flight?.flight_number || flightNumber.value
+        seatNumber.value = booking.seat_number || seatNumber.value
+        total.value = booking.total_price || total.value
+        status.value = booking.status?.toLowerCase() || status.value
+    } catch (error) {
+        console.error('Error fetching booking details:', error)
+    } finally {
+        loading.value = false
+    }
+}
 
 const formatDate = (dateString) => {
     if (!dateString) return ''
@@ -117,10 +165,16 @@ const goToBookings = () => {
     router.push({ name: 'my-bookings' })
 }
 
-onMounted(() => {
+onMounted(async () => {
     // If no booking reference, redirect to home
-    if (!bookingRef.value) {
+    if (!bookingRef.value && !bookingId.value) {
         router.push({ name: 'home' })
+        return
+    }
+
+    // Fetch full details if we have bookingId but missing other info
+    if (bookingId.value && (!origin.value || !destination.value)) {
+        await fetchBookingDetails()
     }
 
     // Auto redirect to bookings after 5 seconds ONLY if coming from booking completion

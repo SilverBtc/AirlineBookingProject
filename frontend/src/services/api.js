@@ -63,7 +63,7 @@ export const bookingAPI = {
         return apiClient.get(`/api/bookings/${id}`)
     },
     cancel(id) {
-        return apiClient.delete(`/api/bookings/${id}`)
+        return apiClient.post(`/api/bookings/${id}/cancel`)
     }
 }
 
